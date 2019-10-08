@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node index",
+    "watch": "nodemon index",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -11,5 +13,8 @@
   "dependencies": {
     "express": "^4.17.1",
     "pdf-lib": "^1.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.3"
   }
 }

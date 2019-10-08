@@ -18,16 +18,15 @@ async function renderPdf(err, data) {
     y: height / 2 + 300,
     size: 50,
     font: helveticaFont,
-    color: rgb(1, 0.1, 0.1),
+    color: rgb(1, 0, 1),
     rotate: degrees(-45),
   })
 
   const pdfBytes = await pdfDoc.save();
 
-  fs.writeFile('./public/charlist_edited1.pdf', pdfBytes,{falg: 'r+'},  (err) => {
-    if (err) throw err;
+  fs.writeFile('./public/charlist_edited.pdf', pdfBytes,{},  (err) => {
+    if (err) console.log(err);
   });
-
 }
 
 module.exports = renderPdf;
