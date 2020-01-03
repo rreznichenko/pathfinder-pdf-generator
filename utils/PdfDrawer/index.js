@@ -1,59 +1,39 @@
 const fs = require('fs');
-const { PDFDocument, rgb } = require('pdf-lib');
+const { PDFDocument, rgb, StandardFonts } = require('pdf-lib');
 
-class PdfDrawer {
-
-    constructor(path) {
-        const self = this;
-        this.document = {};
-        this.font = '';
-        this.fontSize = '';
-        this.filePath = path;
-        fs.readFile(path, (err, data) => {
-            self.setDocument(data);
+async function drawText(file, characterSpec) {
+    const pdfDoc = await PDFDocument.load(file)
+    const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica)
+    const pages = pdfDoc.getPages()
+    const firstPage = pages[0]
+    const { width, height } = firstPage.getSize()
+    characterSpec.forEach(item => {
+        firstPage.drawText(item.text, {
+            x: item.x,
+            y: item.y,
+            size: 14,
+            font: helveticaFont,
+            color: rgb(1, 0, 1),
         })
-    }
-
-    async setDocument(data) {
-        this.document = await PDFDocument.load(data)
-        return this;
-    }
-
-    async setFont(font) {
-        this.font = await this.document.embedFont(font);
-        return this;
-    }
-
-    setFontSize(size) {
-        this.fontSize = size;
-        return this;
-    }
-
-    getPages() {
-        return this.document.getPages();
-    }
-
-    getPageSize(page) {
-        return {width, height} = page.getSize();
-    }
-
-    draw({page, text, x, y, color} = {}) {
-        page.drawText(text, {
-            x: x,
-            y: y,
-            size: this.fontSize,
-            font: this.font,
-            color: rgb(...color),
-        })
-        return this;
-    }
-
-    async save() {
-        const bytes = await this.document.save();
-        fs.writeFile(this.path, bytes, {}, (err) => {
-            if (err) console.log(err);
-        });
-    }
+    })
+    
+    return await pdfDoc.save();
 }
 
-module.exports = PdfDrawer;
+function pdfDrawer(path, characterSpec) {
+    fs.readFile(path, async (err, data) => {
+        if(err) {
+            return err;
+        }
+       
+        const pdfBytes = await drawText(data, characterSpec);
+    
+        fs.writeFile('./public/charlist_edited.pdf', pdfBytes,{},  (err) => {
+            if (err) console.log(err);
+        });
+
+    });
+}
+
+module.exports = pdfDrawer;
+
